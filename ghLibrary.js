@@ -293,16 +293,88 @@ if (!Array.prototype.intersect) {
 if (!Array.prototype.intersectSorted) { // Not thoroughly tested
 	Array.prototype.intersectSorted = function () {
 		// NOTES: This breaks once a match has been found, thus reducing run time
-		var a, a1, a2, n, l, l2, i, j;
-		if (!arguments.length) {
+        function merge(left, right) {
+			var llength = left.length;
+			var rlength = right.length;
+			var result = [];
+			var i = 0;
+			var k = 0;
+			var j = 0;
+			var m = 0;
+            var q;
+			while (llength > 0 || rlength > 0) {
+				if (llength > 0 && rlength > 0) {
+					if (left[j] <= right[m]) {
+						result[k] = left[j];
+						k++; // result
+						j++; // left
+						llength--;
+					} else {
+						result[k] = right[m];
+						k++;
+						m++;
+						rlength--;
+					}
+				} else if (llength > 0) {
+					q = result.length;
+					for (i = j; i < left.length; i++) {
+						result[q] = left[i];
+						q++;
+					}
+					break;
+				} else if (rlength > 0) {
+					q = result.length;
+					for (i = m; i < right.length; i++) {
+						result[q] = right[i];
+						q++;
+					}
+					break;
+				}
+			}
+			
+			return result;
+		}
+		function mergeSort(array) {
+			var length = array.length;
+			if (length <= 1) {
+				return array;
+			}
+            var left = [];
+            var right = [];
+            
+            var mi = (array.length) % 2;
+            if (mi === 0) {
+                mi = (array.length) / 2;
+            } else {
+                mi = (array.length - 1) / 2;
+            }
+            var i;
+            for (i = 0; i < mi; i++) {
+                left[i] = array[i];
+            }
+            var j = 0;
+            for (i = mi; i < array.length; i++) {
+                right[j] = array[i];
+                j++;
+            }
+            j = 0;
+            left = mergeSort(left);
+            right = mergeSort(right);
+            var result = [];
+            result = merge(left, right);
+            return result;
+		}
+        if (!arguments.length) {
 			return [];
 		}
-		a1 = this;
-		a2 = null;
-		// a = new Array();
+		var a1 = this;
+		var a2 = null;
+		// a = [];
 		var k = a1.length;
-		var d = new Date();
-		n = 0;
+		// var d = new Date();
+		var n = 0;
+        var l2;
+        var i;
 		// Concentate the strings together
 		while (n < arguments.length) {
 			a2 = arguments[n];
@@ -315,89 +387,15 @@ if (!Array.prototype.intersectSorted) { // Not thoroughly tested
 		}
 		// Sort the strings
 		a1 = mergeSort(a1);
-		a = [];
+		var a = [];
 		// Keep the duplicate neighbors. (Curr. Only one array can be intersected)
-		l = a1.length;
+		var l = a1.length;
 		for (i = 0; i < l; i++) {
 			if (a1[i] === a1[i + 1]) {
 				a.push(a1[i]);
 			}
 		}
 		// a = mergeSort(a);
-		
-		function mergeSort(array) {
-			var length = array.length;
-			if (length <= 1) {
-				return array;
-			}
-
-				var left = [];
-				var right = [];
-				
-				var mi = (array.length) % 2;
-				if (mi === 0) {
-					mi = (array.length) / 2;
-				} else {
-					mi = (array.length - 1) / 2;
-				}
-
-				for (var i = 0; i < mi; i++) {
-					left[i] = array[i];
-				}
-				var j = 0;
-				for (var i = mi; i < array.length; i++) {
-					right[j] = array[i];
-					j++;
-				}
-				j = 0;
-				left = mergeSort(left);
-				right = mergeSort(right);
-				var result = new Array();
-				result = merge(left, right);
-
-				return result;
-		}
-		function merge(left, right) {
-			var llength = left.length;
-			var rlength = right.length;
-			var result = new Array();
-			var i = 0;
-			var k = 0;
-			var j = 0;
-			var m = 0;
-			while (llength > 0 || rlength > 0) {
-				if (llength > 0 && rlength > 0) {
-					if (left[j] <= right[m]) {
-						result[k] = left[j];
-						k++;// result
-						j++;// left
-						llength--;
-					} else {
-						result[k] = right[m];
-						k++;
-						m++;
-						rlength--;
-					}
-				} else if (llength > 0) {
-					var q = result.length;
-					for (var i = j; i < left.length; i++) {
-						result[q] = left[i];
-						q++;
-					}
-					break;
-				}else if (rlength > 0) {
-					var q = result.length;
-					for (var i = m; i < right.length; i++) {
-						result[q] = right[i];
-						q++;
-					}
-					break;
-				}
-			}
-			
-			return result;
-		}
-		
 		return a;
 	};
 }
@@ -467,7 +465,8 @@ if (!Array.prototype.mean) {
 		// NOTES: Returns the arithmetic mean or average. Will return NaN if any items are NaN
 		// EG: [1,2,3].mean() // returns 2
 		// ATTRIBUTION: By georgehernandez.com for the public domain.
-		for (var i = 0, sum = 0; i < this.length; sum += this[i++]) {
+		var i = 0;
+        for (i = 0, sum = 0; i < this.length; sum += this[i++]) {
 		
 		}
 		return sum / this.length;
@@ -774,14 +773,16 @@ if (!Date.prototype.format) {
 		// ATTRIBUTION: Thanks to http://jacwright.com/projects/javascript/date_format
 		var returnStr = '';
 		var replace = Date.replaceChars;
-		for (var i = 0; i < format.length; i++) {
-			var curChar = format.charAt(i);
-			if (i - 1 >= 0 && format.charAt(i - 1) == "\\") { 
+        var i = 0;
+        var curChar;
+		for (i = 0; i < format.length; i++) {
+			curChar = format.charAt(i);
+			if (i - 1 >= 0 && format.charAt(i - 1) === "\\") { 
 				returnStr += curChar;
 			}
 			else if (replace[curChar]) {
 				returnStr += replace[curChar].call(this);
-			} else if (curChar != "\\"){
+			} else if (curChar !== "\\"){
 				returnStr += curChar;
 			}
 		}
@@ -799,7 +800,7 @@ if (!Date.prototype.format) {
 		j: function() { return this.getDate(); }, // 1-31
 		l: function() { return Date.replaceChars.longDays[this.getDay()]; }, // Sunday-Saturday
 		N: function() { return this.getDay() + 1; }, // 1-7 (Mon-Sun)
-		S: function() { return (this.getDate() % 10 == 1 && this.getDate() != 11 ? 'st' : (this.getDate() % 10 == 2 && this.getDate() != 12 ? 'nd' : (this.getDate() % 10 == 3 && this.getDate() != 13 ? 'rd' : 'th'))); }, // st, nd, rd, th
+		S: function() { return (this.getDate() % 10 === 1 && this.getDate() !== 11 ? 'st' : (this.getDate() % 10 === 2 && this.getDate() !== 12 ? 'nd' : (this.getDate() % 10 === 3 && this.getDate() !== 13 ? 'rd' : 'th'))); }, // st, nd, rd, th
 		w: function() { return this.getDay(); }, // 0-6 (Sun-Sat)
 		z: function() { var d = new Date(this.getFullYear(),0,1); return Math.ceil((this - d) / 86400000); }, // Fixed now // 0-365
 		// Week
@@ -809,12 +810,12 @@ if (!Date.prototype.format) {
 		m: function() { return (this.getMonth() < 9 ? '0' : '') + (this.getMonth() + 1); }, // 01-12
 		M: function() { return Date.replaceChars.shortMonths[this.getMonth()]; }, // Jan-Dec
 		n: function() { return this.getMonth() + 1; }, // 1-12
-		t: function() { var d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 0).getDate() }, // Fixed now, gets #days of date // 28-31
+		t: function() { var d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 0).getDate(); }, // Fixed now, gets #days of date // 28-31
 		// Year
-		L: function() { var year = this.getFullYear(); return (year % 400 == 0 || (year % 100 != 0 && year % 4 == 0)); },	// Fixed now // 1 if leap year
+		L: function() { var year = this.getFullYear(); return (year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0)); },	// Fixed now // 1 if leap year
 		o: function() { var d  = new Date(this.valueOf());  d.setDate(d.getDate() - ((this.getDay() + 6) % 7) + 3); return d.getFullYear();}, // Fixed now // ISO year
 		Y: function() { return this.getFullYear(); }, // EG: 2010
-		y: function() { return ('' + this.getFullYear()).substr(2); }, // EG: 10 (2010)
+		y: function() { return (this.getFullYear()).substr(2); }, // EG: 10 (2010)
 		// Time
 		a: function() { return this.getHours() < 12 ? 'am' : 'pm'; }, // am-pm
 		A: function() { return this.getHours() < 12 ? 'AM' : 'PM'; }, // AM-PM
@@ -1275,7 +1276,7 @@ if (!String.prototype.toTitleCase) {
 		return this.replace(/\w\S*/g, function (txt) {
 			return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
 		});
-	}
+	};
 }
 if (!String.prototype.trim) {
 	String.prototype.trim = function () {
@@ -1380,9 +1381,11 @@ ghj.equals = function (a, b) {
 			return false;
 		} else {
 			for (j in b) {
-				if (!ghj.equals(a[j], b[j])) {
-					return false;
-				}
+				if (b.hasOwnProperty(j)) {
+                    if (!ghj.equals(a[j], b[j])) {
+                        return false;
+                    }
+                }
 			}
 		}
 	}
