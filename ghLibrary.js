@@ -35,6 +35,7 @@ MOD LOG:
 	20110102 1828 Dumped Date.parseISODate for a more elegant upgrade of Date.parse().
 	20110427 1019 Added String's toTitleCase(). Added ghj's clone().
 	20110628 0932 Tweaked Date.parse for potentially missing milliseconds.
+    20111110 1617 Ran JSLint.
 CONTENTS:
 	ARRAY: clear, clone, compareArrays, diff, every, filter, first, foldl, foldr, forEach, indexesOf, indexOf, intArrayToString, last, lastIndexOf, map, max, mean, min, none, random, reduce, reduceRight, reject, remove, removeDuplicated, shuffle, size, some, sortNum, sum
 	DATE Static: dayNames[], daysInMonth[], monthNames[], monthNumbers[], now(), parse()
