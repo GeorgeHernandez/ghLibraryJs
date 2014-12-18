@@ -36,14 +36,15 @@ MOD LOG:
     20110427 1019 Added String's toTitleCase(). Added ghj's clone().
     20110628 0932 Tweaked Date.parse for potentially missing milliseconds.
     20111110 1617 Ran JSLint.
+    2014-12-17 Added groupBy() for arrays.
 CONTENTS:
-    ARRAY: clear, clone, compareArrays, diff, every, filter, first, foldl, foldr, forEach, indexesOf, indexOf, intArrayToString, last, lastIndexOf, map, max, mean, min, none, random, reduce, reduceRight, reject, remove, removeDuplicated, shuffle, size, some, sortNum, sum
-    DATE Static: dayNames[], daysInMonth[], monthNames[], monthNumbers[], now(), parse()
-    DATE Utils: format(), getElapsed(), getGMTOffset(), getDayOfYear(), getDSTOffset(), getDSTOffsetLocale(), getWeek(), getFirstDayOfMonth(), getLastDayOfMonth(), getDaysInMonth(), isLeapYear()
-    NUMBER: constrain, formatDecimal, getSuffix, isInt, pad
-    STRING: encML, endsWith, [escAll], format, pad, padr, repeat, reverse, strip_tags, stripCommentsC, stripCommentsSGML, stripTags, toggle, toIntArray, toTitleCase, trim, triml, trimr, unformatNumber
-    ghj: clone, dateFormat, dateNow, equals, typeOf, wait
-    gho: $, cookieAllowed, cookieDelete, cookieGet, cookieSet, getElementsByClass, insertAfter, toggle
+    Array
+    DATE Static
+    DATE Utils
+    Number
+    String
+    ghj
+    gho
 ***********************************************************/
 /*jslint bitwise: true, browser: true, eqeqeq: true, evil: true, nomen: true, onevar: true, plusplus: true, regexp: true, undef: true, white: true */
 
@@ -198,6 +199,35 @@ if (!Array.prototype.forEach) {
                 fnc.call(thisp, this[i], i, this);
             }
         }
+    };
+}
+if (!Array.prototype.groupBy) {
+    Array.prototype.groupBy = function(fn) {
+        // Returns an array of arrays grouped by fn.
+        // a = [{'first': 'greg', 'last': 'peterson'}, {'first': 'george', 'last': 'hernandez'}, {'first': 'greg', 'last': 'ericson'}, {'first': 'george', 'last': 'lopez'}]
+        // a.groupBy(function(r) { return r.first; })
+        // => [[{'first': 'greg', 'last': 'peterson'}, {'first': 'greg', 'last': 'ericson'}], [{'first': 'george', 'last': 'hernandez'}, {'first': 'george', 'last': 'lopez'}]]
+        if (typeof fn !== "function") {
+            throw new TypeError();
+        }
+
+        var a = this;
+        var d = {};
+        var i = 0;
+        for (i = 0; i < a.length; i++) {
+            var item = a[i];
+            var value = fn(item);
+            (d[value] || (d[value] = [])).push(item);
+        }
+
+        a = [];
+        for (i in d) {
+            if (d.hasOwnProperty(i)) {
+                a.push(d[i]);
+            }
+        }
+
+        return a;
     };
 }
 if (!Array.prototype.indexesOf) {
@@ -702,7 +732,6 @@ if (!Array.prototype.sortNum) {
         });
     };
 }
-
 if (!Array.prototype.sum) {
     Array.prototype.sum = function () {
         // NOTES: Sums the items of an array
@@ -734,12 +763,13 @@ if (!Date.now) {
     };
 }
 
+// Date.parse()
 // ATTRIBUTION: http://zetafleet.com/blog/javascript-dateparse-for-iso-8601
 // NOTES: Takes strings like '2011-01-02T13:12:13:123','2011-01-02T13:12:13', '2011-01-02 13:12 +03:00', '2011-01-02 13:12:13', and '2011-01-02'.
 // NOTES: Compare to the parse() built into Date. JS 1.8.5 may have this built in.
 /**
  * Date.parse with progressive enhancement for ISO-8601, version 2
- * © 2010 Colin Snover <http://zetafleet.com>
+ * 2010 Colin Snover <http://zetafleet.com>
  * Released under MIT license.
  */
 (function () {
