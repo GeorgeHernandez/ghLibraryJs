@@ -2,7 +2,7 @@
 
 ### What? ###
 
-* _Summary_: This "ghLibraryJs" git repository contains some JavaScript utility code that I've used over the years. Much of it should be deprecated because JavaScript and JavaScript libraries have changed over the years.
+* _Summary_: This "ghLibraryJs" git repository is public and contains some JavaScript utility code that I've used over the years. It focuses on language-level items and should not change from site-to-site. Much of it should be deprecated but why throw away code?
 * _Language_: JavaScript.
 * _Version_: 2017-06-15.
 
