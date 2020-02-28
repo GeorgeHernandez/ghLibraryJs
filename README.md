@@ -7,5 +7,5 @@
 * _Version_: 2017-06-15.
 
 ### Who? ###
-* _Authors_: George Hernandez (gh@georgehernandez.com).
+* _Authors_: George Hernandez.
 * _Licensing_: Public. Free: _gratis_ (as in beer) and _libre_ (as in speech). I  have referenced code inspirational source as much as possible.
